@@ -9,79 +9,83 @@ public class Main2
     static double[] ValorDe = new double[30];
     public static void main(String[] args) throws Exception
     {
-        try
+        for(;;)
         {
-            System.out.println("Olá! Seja bem-vindo a calculadora infixa e Pós fixa!");
-            System.out.println("Digite a expressão a ser calculada:  ");
-            String digito = Teclado.getUmString();
-            int parent1 = 0;
-            int parent2 = 0;
-
-            for(int j = 0; j < digito.length(); j++)
+            try
             {
-                if(digito.charAt(j) == '(')
-                    parent1++;
-                else if(digito.charAt(j) == ')')
-                    parent2++;
-            }
+                System.out.println("Olá! Seja bem-vindo a calculadora infixa e Pós fixa!");
+                System.out.println("Digite a expressão a ser calculada:  ");
+                String digito = Teclado.getUmString();
+                int parent1 = 0;
+                int parent2 = 0;
 
-            if(parent1 > parent2)
-                throw new  Exception("Cadeia em formato errado! Faltou isso: ( ");
-            else if(parent1 < parent2)
-                throw new Exception("Cadeia em formato errado! Faltou isso: ) ");
-
-            else
-            {
-                String valor = "";
-                String infixa = "";
-                int cnt = 0;
-
-                for(int i = 0; i < digito.length(); i++)
+                for(int j = 0; j < digito.length(); j++)
                 {
-                    if(!Ehoperador(digito.charAt(i)) && digito.charAt(i) != '.')
-                    {
-                        valor += digito.charAt(i);
-                    }
+                    if(digito.charAt(j) == '(')
+                        parent1++;
+                    else if(digito.charAt(j) == ')')
+                        parent2++;
+                }
 
-                    else if(digito.charAt(i) == '.')
-                    {
-                        valor += '.';
-                    }
+                if(parent1 > parent2)
+                    throw new  Exception("Cadeia em formato errado! Faltou isso: ( ");
+                else if(parent1 < parent2)
+                    throw new Exception("Cadeia em formato errado! Faltou isso: ) ");
 
-                    else {
-                        if (!valor.equals("")) {
-                            ValorDe[cnt] = Double.parseDouble(valor);
-                            char letrinha = (char) (cnt + 'A');
-                            cnt++;
-                            valor = "";
-                            infixa += letrinha;
+                else
+                {
+                    String valor = "";
+                    String infixa = "";
+                    int cnt = 0;
+
+                    for(int i = 0; i < digito.length(); i++)
+                    {
+                        if(!Ehoperador(digito.charAt(i)) && digito.charAt(i) != '.')
+                        {
+                            valor += digito.charAt(i);
                         }
-                        infixa += digito.charAt(i);
+
+                        else if(digito.charAt(i) == '.')
+                        {
+                            valor += '.';
+                        }
+
+                        else {
+                            if (!valor.equals("")) {
+                                ValorDe[cnt] = Double.parseDouble(valor);
+                                char letrinha = (char) (cnt + 'A');
+                                cnt++;
+                                valor = "";
+                                infixa += letrinha;
+                            }
+                            infixa += digito.charAt(i);
+                        }
                     }
+
+                    if(!valor.equals(""))
+                    {
+                        ValorDe[cnt] = Double.parseDouble(valor);
+                        char letrinha = (char)(cnt + 'A');
+                        cnt++;
+                        valor = "";
+                        infixa += letrinha;
+                    }
+
+                    String posFixa = converterInfixaParaPosfixa(infixa);
+
+                    System.out.println(posFixa);
+
+                    double resultado = ValorExpressaoPosFixa(posFixa);
+
+                    System.out.println(resultado);
                 }
+            }
 
-                if(!valor.equals(""))
-                {
-                    ValorDe[cnt] = Double.parseDouble(valor);
-                    char letrinha = (char)(cnt + 'A');
-                    cnt++;
-                    valor = "";
-                    infixa += letrinha;
-                }
-
-                String posFixa = converterInfixaParaPosfixa(infixa);
-
-                double resultado = ValorExpressaoPosFixa(posFixa);
-
-                System.out.println(resultado);
+            catch (Exception err)
+            {
+                System.err.println(err.getMessage());
             }
         }
-
-        catch (Exception err)
-        {
-            System.err.println(err.getMessage());
-        }
-
     }
 
     static char[] validos = {'+', '-', '*', '/', '^', '{', '[', '('};
@@ -204,40 +208,38 @@ public class Main2
         //String[] cadeiasLidas = new String[cadeiaLida.length()];
         String resultado = "";
         PIlhaLista<Character> umaPilha = new PIlhaLista<Character>();   //Instância a Pilha
-        char operandoMaior = ' ';
+
         for (int indice = 0; indice < cadeiaLida.length(); indice++)
         {
             char simboloLido = cadeiaLida.charAt(indice);
+
             if (!Ehoperador(simboloLido))
             {
                 resultado += simboloLido;
             }
+
             else
             {
-                boolean parou = false;
-                while (!parou && !umaPilha.EstaVazia() && TerPrecedencia(umaPilha.OTopo(), simboloLido))
-                {
-                    if (operandoMaior != '(') {
-                        resultado += operandoMaior;
-                    } else
-                        parou = true;
-                }
+                while (!umaPilha.EstaVazia() && TerPrecedencia(umaPilha.OTopo(), simboloLido) && umaPilha.OTopo() != '(')
+                    resultado += umaPilha.Desempilhar();
+
                 if(simboloLido != ')')
                     umaPilha.Empilhar(simboloLido);
-                else
-                {
-                    operandoMaior = umaPilha.Desempilhar();
-                    resultado += operandoMaior;
-                }
+
+                else if (umaPilha.OTopo() != '(')
+                    resultado += umaPilha.Desempilhar();
             }
         }
+
         while (!umaPilha.EstaVazia())
         {
-            operandoMaior = umaPilha.Desempilhar();
-            if (operandoMaior != '(')
-            resultado += operandoMaior;
+            if (umaPilha.OTopo() == '(')
+                umaPilha.Desempilhar();
 
+            else
+                resultado += umaPilha.Desempilhar();
         }
+
         return resultado;
     }
 
