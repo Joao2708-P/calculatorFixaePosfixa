@@ -1,49 +1,107 @@
 package com.company;
 
+import java.util.EventListener;
 import java.util.Random;
 import java.util.Scanner;
 
 public class Main2
 {
-    public static void main(String[] args)throws Exception
+    static double[] ValorDe = new double[30];
+    public static void main(String[] args) throws Exception
     {
-        PilhaVetor<Integer> p1 = new PilhaVetor<Integer>(300);
-        //Random rnd = new Random(300);
-        //p1.Empilhar(600);
+        try
+        {
+            System.out.println("Olá! Seja bem-vindo a calculadora infixa e Pós fixa!");
+            System.out.println("Digite a expressão a ser calculada:  ");
+            String digito = Teclado.getUmString();
+            int parent1 = 0;
+            int parent2 = 0;
 
-            try
+            for(int j = 0; j < digito.length(); j++)
             {
-                System.out.println("Digite uma sequencia de operações:  ");
-                String digito = Teclado.getUmString();
-                balancear(digito);
-            }
-            catch (Exception err)
-            {
-                System.err.println(err.getMessage());
+                if(digito.charAt(j) == '(')
+                    parent1++;
+                else if(digito.charAt(j) == ')')
+                    parent2++;
             }
 
-            //System.out.println(p1);
+            if(parent1 > parent2)
+                throw new  Exception("Cadeia em formato errado! Faltou isso: ( ");
+            else if(parent1 < parent2)
+                throw new Exception("Cadeia em formato errado! Faltou isso: ) ");
+
+            else
+            {
+                String valor = "";
+                String infixa = "";
+                int cnt = 0;
+
+                for(int i = 0; i < digito.length(); i++)
+                {
+                    if(!Ehoperador(digito.charAt(i)) && digito.charAt(i) != '.')
+                    {
+                        valor += digito.charAt(i);
+                    }
+
+                    else if(digito.charAt(i) == '.')
+                    {
+                        valor += '.';
+                    }
+
+                    else {
+                        if (!valor.equals("")) {
+                            ValorDe[cnt] = Double.parseDouble(valor);
+                            char letrinha = (char) (cnt + 'A');
+                            cnt++;
+                            valor = "";
+                            infixa += letrinha;
+                        }
+                        infixa += digito.charAt(i);
+                    }
+                }
+
+                if(!valor.equals(""))
+                {
+                    ValorDe[cnt] = Double.parseDouble(valor);
+                    char letrinha = (char)(cnt + 'A');
+                    cnt++;
+                    valor = "";
+                    infixa += letrinha;
+                }
+
+                String posFixa = converterInfixaParaPosfixa(infixa);
+
+                double resultado = ValorExpressaoPosFixa(posFixa);
+
+                System.out.println(resultado);
+            }
+        }
+
+        catch (Exception err)
+        {
+            System.err.println(err.getMessage());
+        }
+
     }
 
-    public static boolean balancear(String balance)throws Exception
+    static char[] validos = {'+', '-', '*', '/', '^', '{', '[', '('};
+
+    public static boolean balancear(String balance) throws Exception
     {
         String[] d = new String[balance.length()];
         boolean balnco = true;
         PilhaVetor<String> p2 = new PilhaVetor<String>(balance.length());
-        for(int i =0; i < balance.length(); i++)
+        for (int i = 0; i < balance.length(); i++)
         {
             d[i] = String.valueOf(balance.charAt(i));
         }
-        for(int j = 0; j < balance.length() && balnco; j++)
+        for (int j = 0; j < balance.length() && balnco; j++)
         {
-            if(EVerdade(d[j]))
-            {
+            if (EVerdade(d[j])) {
                 p2.Empilhar(d[j] + "");
-            }
-            else
-            {
+            } else {
                 String caracterAbertura = p2.Desempilhar();
-                if (!Combinam(caracterAbertura, d[j]+""))
+                if (!Combinam(caracterAbertura, d[j] + ""))
                     balnco = false;
             }
         }
@@ -52,13 +110,13 @@ public class Main2
     }
 
 
+    //Olha quais operações veem primeiro!
     private static boolean TerPrecedencia(char valorLido, char simboloLido)
     {
         boolean temPrecedencia = false;
-        switch(valorLido)
-        {
+        switch (valorLido) {
             case '(':
-                if(simboloLido == ')')
+                if (simboloLido == ')')
                     temPrecedencia = true;
                 break;
 
@@ -68,75 +126,72 @@ public class Main2
                 else
                     temPrecedencia = true;
                 break;
+
             case '*':
-                if(simboloLido == '(' || simboloLido == '^')
+                if (simboloLido == '('  || simboloLido == '^')
                     temPrecedencia = false;
                 else
                     temPrecedencia = true;
                 break;
+
             case '/':
-                if(simboloLido == '(' || simboloLido == '^' || simboloLido == '*')
+                if (simboloLido == '(' || simboloLido == '^' || simboloLido == '*')
                     temPrecedencia = false;
                 else
                     temPrecedencia = true;
                 break;
+
             case '-':
-                if(simboloLido == '(' || simboloLido == '^' || simboloLido == '*' || simboloLido == '/' )
+                if (simboloLido == '(' || simboloLido == '^' || simboloLido == '*' || simboloLido == '/')
                     temPrecedencia = false;
                 else
                     temPrecedencia = true;
                 break;
+
             case '+':
-                if(simboloLido == '(' || simboloLido == '^' || simboloLido == '*' || simboloLido == '/' || simboloLido == '-' )
+                if (simboloLido == '(' || simboloLido == '^' || simboloLido == '*' || simboloLido == '/' || simboloLido == '-')
                     temPrecedencia = false;
                 else
                     temPrecedencia = true;
                 break;
-            default:
         }
 
         return temPrecedencia;
     }
 
+    //Validação de operadores
     public static boolean Ehoperador(char simbolo)
     {
         boolean simboloReal = false;
-        if(simbolo == '(')
+        if (simbolo == '(')
             simboloReal = true;
-        else if(simbolo == ')')
+        else if (simbolo == ')')
             simboloReal = true;
-        else if(simbolo == '[')
+        else if (simbolo == '+')
             simboloReal = true;
-        else if(simbolo == ']')
+        else if (simbolo == '-')
             simboloReal = true;
-        else if(simbolo == '{')
+        else if (simbolo == '*')
             simboloReal = true;
-        else if(simbolo == '}')
+        else if (simbolo == '/')
             simboloReal = true;
-        else if(simbolo == '+')
-            simboloReal = true;
-        else if(simbolo == '-')
-            simboloReal = true;
-        else if(simbolo == '*')
-            simboloReal = true;
-        else if(simbolo == '/')
-            simboloReal = true;
-        else if(simbolo == '^')
+        else if (simbolo == '^')
             simboloReal = true;
 
         return simboloReal;
     }
+
     public static boolean EVerdade(String caracter)
     {
         boolean ehVerdade = false;
-        if(caracter.equals("("))
+        if (caracter.equals("("))
             ehVerdade = true;
-        else if(caracter.equals("{"))
+        else if (caracter.equals("{"))
             ehVerdade = true;
-        else if(caracter.equals("["))
+        else if (caracter.equals("["))
             ehVerdade = true;
 
-        return  ehVerdade;
+        return ehVerdade;
     }
 
     private static boolean Combinam(String abre, String fecha)
@@ -146,13 +201,14 @@ public class Main2
 
     private static String converterInfixaParaPosfixa(String cadeiaLida) throws Exception
     {
-        String[] cadeiasLidas = new String[cadeiaLida.length()];
+        //String[] cadeiasLidas = new String[cadeiaLida.length()];
         String resultado = "";
-        PilhaVetor<Character> umaPilha = new PilhaVetor<Character>();   //Instância a Pilha
-        for(int indice = 0; indice < cadeiaLida.length(); indice++)
+        PIlhaLista<Character> umaPilha = new PIlhaLista<Character>();   //Instância a Pilha
+        char operandoMaior = ' ';
+        for (int indice = 0; indice < cadeiaLida.length(); indice++)
         {
             char simboloLido = cadeiaLida.charAt(indice);
-            if(!Ehoperador(simboloLido))
+            if (!Ehoperador(simboloLido))
             {
                 resultado += simboloLido;
             }
@@ -161,16 +217,76 @@ public class Main2
                 boolean parou = false;
                 while (!parou && !umaPilha.EstaVazia() && TerPrecedencia(umaPilha.OTopo(), simboloLido))
                 {
-                   char operandoMaior = umaPilha.Desempilhar();
-                   if(operandoMaior != '(')
-                   {
-                       resultado += operandoMaior;
-                   }
-                   else
-                       parou = true;
+                    if (operandoMaior != '(') {
+                        resultado += operandoMaior;
+                    } else
+                        parou = true;
+                }
+                if(simboloLido != ')')
+                    umaPilha.Empilhar(simboloLido);
+                else
+                {
+                    operandoMaior = umaPilha.Desempilhar();
+                    resultado += operandoMaior;
                 }
             }
         }
+        while (!umaPilha.EstaVazia())
+        {
+            operandoMaior = umaPilha.Desempilhar();
+            if (operandoMaior != '(')
+            resultado += operandoMaior;
+
+        }
         return resultado;
+    }
+
+    private static double ValorDaSubExpressao(double valor1, char simbolo, double valor2)
+    {
+        double resultado = 0;
+        switch (simbolo)
+        {
+            case '+':
+                resultado = valor1 + valor2;
+                break;
+            case '-':
+                resultado = valor1 - valor2;
+                break;
+            case '^':
+                resultado = Math.pow(valor1, valor2);
+                break;
+            case '*':
+                resultado = valor1 * valor2;
+                break;
+            case '/':
+                resultado = valor1 / valor2;
+                break;
+        }
+
+        return resultado;
+    }
+
+    private static double ValorExpressaoPosFixa(String cadeiaPosfixa) throws Exception
+    {
+
+       PIlhaLista<Double> umaPilha = new PIlhaLista<Double>();
+
+       for (int i = 0; i < cadeiaPosfixa.length(); i++)
+       {
+           char simboloLido = cadeiaPosfixa.charAt(i);
+           if(!Ehoperador(simboloLido))
+           {
+               umaPilha.Empilhar(ValorDe[simboloLido - 'A']);
+           }
+           else
+           {
+               double operando2 = umaPilha.Desempilhar();
+               double operando1 = umaPilha.Desempilhar();
+               double valor = ValorDaSubExpressao(operando1, simboloLido, operando2);
+               umaPilha.Empilhar(valor);
+           }
+       }
+
+       return umaPilha.Desempilhar();
     }
 }
