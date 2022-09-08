@@ -7,6 +7,7 @@ import java.util.Scanner;
 public class Main2
 {
     static double[] ValorDe = new double[30];
+    //FilaVetor<Double> valorDe = new FilaVetor<Double>(30);
     public static void main(String[] args) throws Exception
     {
         for(;;)

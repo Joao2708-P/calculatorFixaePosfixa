@@ -58,26 +58,12 @@ public class PilhaVetor<Dado> implements IStack<Dado>
 
     public PilhaVetor<Dado> Clone() throws Exception
     {
-        int maximo = 10000000;
-        PilhaVetor<Dado> ret = new PilhaVetor<Dado>(maximo);
-        Dado[] uNova = (Dado[]) new Comparable[maximo];
-        int i = 0;
-        while (!this.EstaVazia())
-        {
-            uNova[i] = (Dado) this.Desempilhar();
-            i++;
-        }
-        for(int j = uNova.length - 1; j >= 0; j--)
-        {
-            Dado k = (Dado) uNova[j];
+        PilhaVetor<Dado> nova = new PilhaVetor<Dado>();
 
-            Dado h = (Dado) k;
+        nova.p    = this.p;
+        nova.topo = this.topo;
 
-            this.Empilhar(h);
-
-            ret.Empilhar((Dado) k);
-        }
-        return ret;
+        return nova;
     }
 
 
