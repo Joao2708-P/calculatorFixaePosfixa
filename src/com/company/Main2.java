@@ -8,6 +8,7 @@ public class Main2
 {
     static double[] ValorDe = new double[30];
     //FilaVetor<Double> valorDe = new FilaVetor<Double>(30);
+
     public static void main(String[] args) throws Exception
     {
         for(;;)
@@ -15,70 +16,92 @@ public class Main2
             try
             {
                 System.out.println("Olá! Seja bem-vindo a calculadora infixa e Pós fixa!");
-                System.out.println("Digite a expressão a ser calculada:  ");
-                String digito = Teclado.getUmString();
-                int parent1 = 0;
-                int parent2 = 0;
-
-                for(int j = 0; j < digito.length(); j++)
+                System.out.println("Deseja fazer uma operação? S - Sim - N - Não");
+                char opcao = Teclado.getUmChar();
+                switch (opcao)
                 {
-                    if(digito.charAt(j) == '(')
-                        parent1++;
-                    else if(digito.charAt(j) == ')')
-                        parent2++;
-                }
-
-                if(parent1 > parent2)
-                    throw new  Exception("Cadeia em formato errado! Faltou isso: ( ");
-                else if(parent1 < parent2)
-                    throw new Exception("Cadeia em formato errado! Faltou isso: ) ");
-
-                else
-                {
-                    String valor = "";
-                    String infixa = "";
-                    int cnt = 0;
-
-                    for(int i = 0; i < digito.length(); i++)
+                    case 'n':
                     {
-                        if(!Ehoperador(digito.charAt(i)) && digito.charAt(i) != '.')
-                        {
-                            valor += digito.charAt(i);
-                        }
+                        System.exit(0);
+                        break;
+                    }
 
-                        else if(digito.charAt(i) == '.')
+                    case 's':
+                    {
+                        try
                         {
-                            valor += '.';
-                        }
+                            System.out.println("Digite a expressão a ser calculada:  ");
+                            String digito = Teclado.getUmString();
+                            int parent1 = 0;
+                            int parent2 = 0;
 
-                        else {
-                            if (!valor.equals("")) {
-                                ValorDe[cnt] = Double.parseDouble(valor);
-                                char letrinha = (char) (cnt + 'A');
-                                cnt++;
-                                valor = "";
-                                infixa += letrinha;
+                            for(int j = 0; j < digito.length(); j++)
+                            {
+                                if(digito.charAt(j) == '(')
+                                    parent1++;
+                                else if(digito.charAt(j) == ')')
+                                    parent2++;
                             }
-                            infixa += digito.charAt(i);
+
+                            if(parent1 > parent2)
+                                throw new  Exception("Cadeia em formato errado! Faltou isso: ( ");
+                            else if(parent1 < parent2)
+                                throw new Exception("Cadeia em formato errado! Faltou isso: ) ");
+
+                            else
+                            {
+                                String valor = "";
+                                String infixa = "";
+                                int cnt = 0;
+
+                                for(int i = 0; i < digito.length(); i++)
+                                {
+                                    if(!Ehoperador(digito.charAt(i)) && digito.charAt(i) != '.')
+                                    {
+                                        valor += digito.charAt(i);
+                                    }
+
+                                    else if(digito.charAt(i) == '.')
+                                    {
+                                        valor += '.';
+                                    }
+
+                                    else {
+                                        if (!valor.equals("")) {
+                                            ValorDe[cnt] = Double.parseDouble(valor);
+                                            char letrinha = (char) (cnt + 'A');
+                                            cnt++;
+                                            valor = "";
+                                            infixa += letrinha;
+                                        }
+                                        infixa += digito.charAt(i);
+                                    }
+                                }
+
+                                if(!valor.equals(""))
+                                {
+                                    ValorDe[cnt] = Double.parseDouble(valor);
+                                    char letrinha = (char)(cnt + 'A');
+                                    cnt++;
+                                    valor = "";
+                                    infixa += letrinha;
+                                }
+
+                                String posFixa = converterInfixaParaPosfixa(infixa);
+
+                                System.out.println(posFixa);
+
+                                double resultado = ValorExpressaoPosFixa(posFixa);
+
+                                System.out.println(resultado);
+                            }
                         }
+                        catch (Exception e)
+                        {
+                            System.err.println(e.getMessage());
+                        }
+
                     }
-
-                    if(!valor.equals(""))
-                    {
-                        ValorDe[cnt] = Double.parseDouble(valor);
-                        char letrinha = (char)(cnt + 'A');
-                        cnt++;
-                        valor = "";
-                        infixa += letrinha;
-                    }
-
-                    String posFixa = converterInfixaParaPosfixa(infixa);
-
-                    System.out.println(posFixa);
-
-                    double resultado = ValorExpressaoPosFixa(posFixa);
-
-                    System.out.println(resultado);
                 }
             }
 
@@ -89,8 +112,9 @@ public class Main2
         }
     }
 
-    static char[] validos = {'+', '-', '*', '/', '^', '{', '[', '('};
+    //static char[] validos = {'+', '-', '*', '/', '^', '{', '[', '('};
 
+    /*
     public static boolean balancear(String balance) throws Exception
     {
         String[] d = new String[balance.length()];
@@ -113,7 +137,7 @@ public class Main2
         System.out.println(p2);
         return balnco;
     }
-
+  */
 
     //Olha quais operações veem primeiro!
     private static boolean TerPrecedencia(char valorLido, char simboloLido)
@@ -186,23 +210,26 @@ public class Main2
         return simboloReal;
     }
 
-    public static boolean EVerdade(String caracter)
-    {
-        boolean ehVerdade = false;
-        if (caracter.equals("("))
-            ehVerdade = true;
-        else if (caracter.equals("{"))
-            ehVerdade = true;
-        else if (caracter.equals("["))
-            ehVerdade = true;
+    /*
+        public static boolean EVerdade(String caracter)
+        {
+            boolean ehVerdade = false;
+            if (caracter.equals("("))
+                ehVerdade = true;
+            else if (caracter.equals("{"))
+                ehVerdade = true;
+            else if (caracter.equals("["))
+                ehVerdade = true;
 
-        return ehVerdade;
-    }
+            return ehVerdade;
+        }
 
-    private static boolean Combinam(String abre, String fecha)
-    {
-        return (abre == "{" && fecha == "}") || (abre == "[" && fecha == "]") || (abre == "(" && fecha == ")");
-    }
+        private static boolean Combinam(String abre, String fecha)
+        {
+            return (abre == "{" && fecha == "}") || (abre == "[" && fecha == "]") || (abre == "(" && fecha == ")");
+        }
+    */
+
 
     private static String converterInfixaParaPosfixa(String cadeiaLida) throws Exception
     {
@@ -261,9 +288,19 @@ public class Main2
             case '*':
                 resultado = valor1 * valor2;
                 break;
+
             case '/':
-                resultado = valor1 / valor2;
+            {
+                if(valor2 == 0 || valor1 == 0)
+                {
+                    System.err.println("Não é possivél dividir por zero!");
+                }
+                else
+                {
+                    resultado = valor1 / valor2;
+                }
                 break;
+            }
         }
 
         return resultado;

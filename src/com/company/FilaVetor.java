@@ -6,9 +6,9 @@ import java.util.List;
 public class FilaVetor<Dado> implements IQueque<Dado>, Comparable<Dado>
 {
     Dado[] f;
-    int inicio,
-            fim,
-            tamanhoMaximo;  // N
+    int inicio, fim, tamanhoMaximo;  // N
+    public FilaVetor()
+    {}
     public FilaVetor(int tamanho)
     {
         f = (Dado[]) new Comparable[tamanho];
